@@ -1,56 +1,71 @@
-var ball;
-var database,ballPosition;
+var Ball, database;
+var position;
+var ballP;
 
-function setup(){
-  database=firebase.database();
-    
-  createCanvas(500,500);
-  ball = createSprite(250,250,10,10);
-  ball.shapeColor = "red";
+function setup() {
+  //Initializing DB
+  database = firebase.database()
 
- //Reading the DB
- //1.Refer to the node - .ref()
- //2.create listener - .on()
- //3.retrieve- .val()
- //4.save it
-  var ballP=database.ref('ball/position');
-  ballP.on("value",readPosition)
+  createCanvas(500, 500);
 
+  Ball = createSprite(250, 250, 10, 10);
+  Ball.shapeColor = "red";
+
+  //1)Reading Value from DB
+
+  //a)Refer to the node --> .ref()
+  //b)create a listener - listen to all the changes in DB --> .on()
+  //c)Retrieving the value from DB --> .val()
+  //d)Saving the data
+
+  ballP = database.ref('ball/position');
+  ballP.on("value", readPosition)
 
 }
 
-function draw(){
-    background("white");
-    if(keyDown(LEFT_ARROW)){
-        changePosition(-1,0);
-    }
-    else if(keyDown(RIGHT_ARROW)){
-        changePosition(1,0);
-    }
-    else if(keyDown(UP_ARROW)){
-        changePosition(0,-1);
-    }
-    else if(keyDown(DOWN_ARROW)){
-        changePosition(0,+1);
-    }
-    drawSprites();
+function draw() {
+  background("black");
+
+  if (keyDown(LEFT_ARROW)) {
+    writePosition(-1, 0);
+  }
+  else if (keyDown(RIGHT_ARROW)) {
+    writePosition(1, 0);
+  }
+  else if (keyDown(UP_ARROW)) {
+    writePosition(0, -1);
+  }
+  else if (keyDown(DOWN_ARROW)) {
+    writePosition(0, +1);
+  }
+  drawSprites();
+
 }
 
-function changePosition(x,y){
-  //writing the data
-  //1.Refer to DB - .ref()
-  //2.update .set() .update()
-   database.ref('ball/position').set({
-     x:ballPosition.x+x,
-     y:ballPosition.y+y
-   })
+function writePosition(x, y) { 
+
+  //2)Write/Update the value in DB
+
+  //a)Refer to the node .ref()
+  //b)update the value -> update() or set()
+
+  database.ref('ball/position').set({
+    x: position.x + x,
+    y: position.y + y
+  })
+
 }
 
-function readPosition(data){
-  ballPosition = data.val(); //x,y value from DATABASE
-  console.log(ballPosition);
+function readPosition(data) {
 
-  //giving DB values to ball Sprite
-  ball.x=ballPosition.x;
-  ball.y=ballPosition.y;
+  position = data.val()
+
+  console.log(position.x) //DB value X
+  console.log(position.y) //DB value Y
+
+  //Change the value of Ball sprite to DB value
+  Ball.x = position.x
+  Ball.y = position.y
 }
+
+
